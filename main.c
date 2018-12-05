@@ -7,20 +7,12 @@
 #include "structs.h"
 
 int main(int argc, char **argv){
-  char *ending = strstr(argv[1], ".cities");
-  if (ending == NULL || strlen(ending) != strlen(".cities")){
-    //printf("O ficheiro não tem a extensão correta.\n");
-    exit (0);
-  }
   FILE *input = fopen(argv[1], "r");
-  if (input == NULL){
-    //printf("Erro a abrir ficheiro\n");
+  if (input == NULL)
     exit (0);
-  }
-  char *name = strtok(argv[1], ".");
-  char *output_name = safeMalloc(sizeof(char) * (strlen(name) + strlen(".walks") + 1));
-  strcpy(output_name, name);
-  strcat(output_name, ".walks");
+  char *output_name = outputName(argv[1]);
+  if (output_name == NULL)
+    exit(0); 
   FILE* output = fopen(output_name, "w");
   free(output_name);
   if (output == NULL){
@@ -67,12 +59,18 @@ int main(int argc, char **argv){
     if (objective == 'A'){
       cost = 0;
       num_points = 0;
-      Path *path = search(map, height, width, tur_points[0][0], tur_points[0][1],
+      Path *path = NULL;
+      int dest_eq_src = tur_points[0][0] == tur_points[1][0] &&  tur_points[0][1] == tur_points[1][1];
+      // se o ponto inicial é valido e o destino é diferente do inicio
+      if (map[tur_points[0][0]][tur_points[0][1]] &&  !dest_eq_src)
+        path = search(map, height, width, tur_points[0][0], tur_points[0][1],
                           tur_points[1][0], tur_points[1][1], &cost, &num_points);
       if(!cost){
         cost=-1;
         num_points=0;
       }
+      if (dest_eq_src)
+        cost = 0;
       fprintf(output, "%d %u\n", cost, num_points);
       Path *p_aux;
       while (path != NULL){

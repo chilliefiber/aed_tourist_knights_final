@@ -6,6 +6,7 @@ Ficheiro com as funções associadas ao processamento dos ficheiros de input
 #include <stdlib.h>
 #include "process.h"
 #include "pointers.h"
+#include <string.h>
 
 unsigned int **createMap(FILE *fp, unsigned int _width, unsigned int _height, char valid_challenge){
   unsigned int aux;
@@ -30,4 +31,22 @@ unsigned int **createMap(FILE *fp, unsigned int _width, unsigned int _height, ch
     }
   }
   return map;
+}
+
+char *outputName(char *input_name){
+  int input_length;
+  if ((input_length = strlen(input_name)) < strlen(".cities") + 1)
+    return NULL;
+  char s[] = ".cities";
+  for (int i = 0; i < strlen(".cities"); i++){
+    if (input_name[input_length - strlen(".cities") + i] != s[i])
+      return NULL;
+  }
+  char c = input_name[input_length - strlen(".cities") - 1]; // caractere imediatamente antes de .cities
+  input_name[input_length - strlen(".cities")] = '\0';
+  char *output_name = safeMalloc(sizeof(char) * (strlen(input_name) + strlen(".walks") + 1));
+  strcpy(output_name, input_name);
+  strcat(output_name, ".walks");        
+  input_name[input_length - strlen(".cities")] = c;
+  return output_name;
 }
