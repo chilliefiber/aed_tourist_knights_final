@@ -9,12 +9,12 @@
 int main(int argc, char **argv){
   char *ending = strstr(argv[1], ".cities");
   if (ending == NULL || strlen(ending) != strlen(".cities")){
-    printf("O ficheiro não tem a extensão correta.\n");
+    //printf("O ficheiro não tem a extensão correta.\n");
     exit (0);
   }
   FILE *input = fopen(argv[1], "r");
   if (input == NULL){
-    printf("Erro a abrir ficheiro\n");
+    //printf("Erro a abrir ficheiro\n");
     exit (0);
   }
   char *name = strtok(argv[1], ".");
@@ -24,7 +24,7 @@ int main(int argc, char **argv){
   FILE* output = fopen(output_name, "w");
   free(output_name);
   if (output == NULL){
-    printf("Erro a criar ficheiro de output\n");
+    //printf("Erro a criar ficheiro de output\n");
     fclose(input);
     exit (0);
   }
@@ -65,10 +65,14 @@ int main(int argc, char **argv){
     }
     map = createMap(input, width, height, valid_challenge);
     if (objective == 'A'){
-      cost = -1;
+      cost = 0;
       num_points = 0;
       Path *path = search(map, height, width, tur_points[0][0], tur_points[0][1],
                           tur_points[1][0], tur_points[1][1], &cost, &num_points);
+      if(!cost){
+        cost=-1;
+        num_points=0;
+      }
       fprintf(output, "%d %u\n", cost, num_points);
       Path *p_aux;
       while (path != NULL){
