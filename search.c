@@ -75,12 +75,7 @@ char explore(Node *p, Point *dest, unsigned int **map, unsigned int _height, uns
       cur->parent = p; // o pai passa a ser o nó que estamos a explorar
       cur->cost = newCost(map, p, points + i); // o custo do nó é atualizado
       // descobrimos o indice deste ponto na heap, e garantimos que a condição de acervo é mantida com o novo custo
-      unsigned int ix;
-      for (ix = 0; i < q->size; i++){
-        if (q->heap[i]->coords.row == points[i].row && q->heap[i]->coords.column == points[i].column)
-          break;
-      }
-      heapifyUp(q, ix);
+      heapifyUp(q, cur->ix);
     }
   }
   free(points);

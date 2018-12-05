@@ -9,6 +9,7 @@ typedef struct Node{
   struct Node *parent;
   Point coords;
   unsigned int cost;
+  unsigned int ix;
 } Node;
 
 typedef struct PQueue{

@@ -44,12 +44,14 @@ Path *createPath(Node *cur, Path *previous, unsigned int _origin_row, unsigned i
 
 void insert(PQueue *q, Node *n){
   q->heap[q->size] = n;
+  n->ix = q->size; // atualizar o indice do no
   q->size = q->size + 1;
   heapifyUp(q, q->size - 1);
 }
 
 void popRoot(PQueue *q){
   q->heap[0] = q->heap[q->size -1];
+  q->heap[0]->ix = 0; // atualizar o indice do no
   q->size = q->size -1;
   heapifyDown(q, 0);
 }
@@ -109,6 +111,9 @@ void swap(unsigned int ix0, unsigned int ix1, Node **heap){
   Node *aux = heap[ix0];
   heap[ix0] = heap[ix1];
   heap[ix1] = aux;
+  // atualizar os indices nos nós
+  heap[ix1]->ix = ix1;
+  heap[ix0]->ix = ix0;
 }
 
 unsigned int heapNodeCost(unsigned int ix, Node **heap){
