@@ -41,9 +41,10 @@ unsigned int pointCost(unsigned int ix, Node **heap);
 unsigned int parentCost(unsigned int ix, Node **heap);
 unsigned int parentIndex(unsigned int ix);
 char empty(PQueue *q);
-void heapify(PQueue *q, unsigned int ix);
 unsigned int currentCost(Node *p);
 unsigned int newCost(unsigned int **map, Node *src, Point *dest);
 unsigned int heapNodeCost(unsigned int ix, Node **heap);
 Path *createPath(Node *cur, Path *previous, unsigned int _origin_row, unsigned int _origin_column, unsigned int *num_points);
+void joinPaths(Path **whole_path, Path *path);
+
 #endif

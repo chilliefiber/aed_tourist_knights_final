@@ -10,7 +10,7 @@ Node ***createNodeMap(unsigned int _height, unsigned int _width){
     map[row] = safeMalloc(sizeof(Node*) * _width);
     for (int column = 0; column < _width; column = column + 1)
       map[row][column] = NULL;
-  }  
+  }
   return map;
 }
 
@@ -23,11 +23,11 @@ void freeNodeMap(Node ***map, unsigned int _height, unsigned int _width){
   free(map);
 }
 
-Path *search(unsigned int **map, unsigned int _height, unsigned int _width, 
+Path *search(unsigned int **map, unsigned int _height, unsigned int _width,
             unsigned int _origin_row, unsigned int _origin_column,
-            unsigned int _dest_row, unsigned int _dest_column, 
+            unsigned int _dest_row, unsigned int _dest_column,
             int *cost, unsigned int *num_points){
-  Node ***nodes = createNodeMap(_height, _width), *cur; 
+  Node ***nodes = createNodeMap(_height, _width), *cur;
   nodes[_origin_row][_origin_column] = createNode(NULL, _origin_row, _origin_column, map);
   PQueue *q = createQueue(_height, _width);
   insert(q, nodes[_origin_row][_origin_column]);
@@ -41,14 +41,14 @@ Path *search(unsigned int **map, unsigned int _height, unsigned int _width,
     popRoot(q);
     if ((finished = explore(cur, &dest, map, _height, _width, nodes, q))){
       shortest_path = createPath(nodes[dest.row][dest.column], NULL, _origin_row, _origin_column, num_points);
-      *cost = nodes[dest.row][dest.column]->cost;
+      *cost += nodes[dest.row][dest.column]->cost;
       break;
-    } 
+    }
   }
   freeNodeMap(nodes, _height, _width);
   freeQueue(q);
   return shortest_path;
-}  
+}
 
 char explore(Node *p, Point *dest, unsigned int **map, unsigned int _height, unsigned int _width, Node ***nodes, PQueue *q){
   char num_accessible_nodes;
@@ -66,7 +66,7 @@ char explore(Node *p, Point *dest, unsigned int **map, unsigned int _height, uns
     // e inserimos o nó na heap
     if (cur == NULL){
       nodes[points[i].row][points[i].column] = createNode(p, points[i].row, points[i].column, map);
-      insert(q, nodes[points[i].row][points[i].column]); 
+      insert(q, nodes[points[i].row][points[i].column]);
       continue;
     }
    // caso contrário, ver se o custo de chegar ao ponto é inferior do que o do caminho guardado. Nesse caso,
@@ -80,7 +80,7 @@ char explore(Node *p, Point *dest, unsigned int **map, unsigned int _height, uns
         if (q->heap[i]->coords.row == points[i].row && q->heap[i]->coords.column == points[i].column)
           break;
       }
-      heapify(q, ix);
+      heapifyUp(q, ix);
     }
   }
   free(points);
@@ -100,11 +100,11 @@ Point *accessibleNodes(Point *p, unsigned int **map, unsigned int _height, unsig
   validatePoint(map, _height, _width, num_accessible_nodes, points, p->row - 1, p->column + 2);
   Point *to_access = safeMalloc(sizeof(Point) * (*num_accessible_nodes));
   for (int i = 0; i < *num_accessible_nodes; i = i + 1)
-    to_access[i] = points[i]; 
+    to_access[i] = points[i];
   return to_access;
 }
 
-void validatePoint(unsigned int **map, unsigned int _height, unsigned int _width, 
+void validatePoint(unsigned int **map, unsigned int _height, unsigned int _width,
                    char *num_accessible_nodes, Point *points,
                    unsigned int _row, unsigned int _column){
   if (isValidPoint(_row, _column, _height, _width, map)){

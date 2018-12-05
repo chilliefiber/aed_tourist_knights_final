@@ -31,7 +31,7 @@ int main(int argc, char **argv){
   unsigned int width, height, num_tur_points, **tur_points = NULL, **map = NULL;
   char not_over;
   char valid_challenge;
-  unsigned int aux1, aux2, num_points;
+  unsigned int aux1, aux2, num_points, cost_acum;
   int cost;
   char objective;
   do {
@@ -79,6 +79,33 @@ int main(int argc, char **argv){
       }
     }
     else if(objective == 'B'){
+      Path *path;
+      Path *whole_path = NULL;
+      cost_acum=0;
+      num_points = 0;
+      for(int i=0; i<num_tur_points-1; i=i+1){
+        cost = 0;
+        path = search(map, height, width, tur_points[i][0], tur_points[i][1],
+                            tur_points[i+1][0], tur_points[i+1][1], &cost, &num_points);
+
+        if(!cost){
+          cost_acum=-1;
+          num_points=0;
+          break;
+        }
+        joinPaths(&whole_path, path);
+
+        cost_acum+=cost;
+    }
+      fprintf(output, "%d %u\n", cost_acum, num_points);
+      Path *p_aux;
+      while (whole_path != NULL){
+        if(num_points)
+          fprintf(output, "%u %u %u\n", whole_path->coords.row, whole_path->coords.column, map[whole_path->coords.row][whole_path->coords.column]);
+        p_aux = whole_path;
+        whole_path = whole_path->next;
+        free(p_aux);
+      }
     }
     else
       fprintf(output, "-1 0");

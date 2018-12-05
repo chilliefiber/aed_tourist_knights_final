@@ -32,12 +32,12 @@ void freeQueue(PQueue *q){
 Path *createPath(Node *cur, Path *previous, unsigned int _origin_row, unsigned int _origin_column, unsigned int *num_points){
   Path *p = safeMalloc(sizeof(Path));
   p->coords.row = cur->coords.row;
-  p->coords.column = cur->coords.column; 
+  p->coords.column = cur->coords.column;
   p->next = previous;
   *num_points = *(num_points) + 1;
   // se chegámos ao primeiro ponto do caminho
   if (cur->parent->coords.row == _origin_row && cur->parent->coords.column == _origin_column)
-    return p; 
+    return p;
   return createPath(cur->parent, p, _origin_row, _origin_column, num_points);
 }
 
@@ -46,7 +46,7 @@ Path *createPath(Node *cur, Path *previous, unsigned int _origin_row, unsigned i
 void insert(PQueue *q, Node *n){
   q->heap[q->size] = n;
   q->size = q->size + 1;
-  heapifyUp(q, q->size - 1);  
+  heapifyUp(q, q->size - 1);
 }
 
 void popRoot(PQueue *q){
@@ -74,7 +74,7 @@ unsigned int smallerChildIndex(unsigned int ix, PQueue *q){
 
 unsigned int swapChildIndex(unsigned int ix, PQueue *q){
   unsigned int childIx = smallerChildIndex(ix, q);
-  if (!childIx) 
+  if (!childIx)
     return 0;
   return heapNodeCost(childIx, q->heap) < heapNodeCost(ix, q->heap) ? childIx : 0;
 }
@@ -121,22 +121,27 @@ unsigned int parentCost(unsigned int ix, Node **heap){
 }
 
 unsigned int parentIndex(unsigned int ix){
-  return (unsigned int) ceil(((double) ix)/2) - 1;
+  return (unsigned int) ((ix-1)/2);
 }
 
 char empty(PQueue *q){
   return q->size == 0;
 }
 
-void heapify(PQueue *q, unsigned int ix){
-  if (ix != 0 && parentCost(ix, q->heap) > heapNodeCost(ix, q->heap)){
-    heapifyUp(q, ix);
-    return;
-  }
-  if (swapChildIndex(ix, q))
-    heapifyDown(q, ix);
-}
-
 unsigned int newCost(unsigned int **map, Node *src, Point *dest){
   return src->cost + map[dest->row][dest->column];
+}
+
+void joinPaths(Path **whole_path, Path *path){
+  if(*whole_path==NULL){
+    *whole_path=path;
+    return;
+  }
+
+  Path *curr = *whole_path;
+
+  while(curr->next!=NULL)
+    curr=curr->next;
+
+  curr->next=path;
 }
