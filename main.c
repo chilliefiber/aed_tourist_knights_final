@@ -23,8 +23,8 @@ int main(int argc, char **argv){
   unsigned int width, height, num_tur_points, **tur_points = NULL, **map = NULL;
   char not_over;
   char valid_challenge;
-  unsigned int aux1, aux2, num_points, cost_acum;
-  int cost;
+  unsigned int aux1, aux2, num_points;
+  int cost, cost_acum;
   char objective;
   do {
     if(fscanf(input, "%u", &height)!=1)
