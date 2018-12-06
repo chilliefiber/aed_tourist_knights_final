@@ -59,18 +59,22 @@ int main(int argc, char **argv){
     if (objective == 'A'){
       cost = 0;
       num_points = 0;
+      int dest_eq_src = 0;
       Path *path = NULL;
-      int dest_eq_src = tur_points[0][0] == tur_points[1][0] &&  tur_points[0][1] == tur_points[1][1];
-      // se o ponto inicial é valido e o destino é diferente do inicio
-      if (map[tur_points[0][0]][tur_points[0][1]] &&  !dest_eq_src)
-        path = search(map, height, width, tur_points[0][0], tur_points[0][1],
-                          tur_points[1][0], tur_points[1][1], &cost, &num_points);
-      if(!cost){
-        cost=-1;
-        num_points=0;
-      }
-      if (dest_eq_src)
-        cost = 0;
+      
+      if (num_tur_points==2){
+        dest_eq_src = tur_points[0][0] == tur_points[1][0] &&  tur_points[0][1] == tur_points[1][1];
+        // se o ponto inicial é valido e o destino é diferente do inicio
+        if (map[tur_points[0][0]][tur_points[0][1]] &&  !dest_eq_src)
+          path = search(map, height, width, tur_points[0][0], tur_points[0][1],
+                            tur_points[1][0], tur_points[1][1], &cost, &num_points);
+      }    
+	  if(!cost){
+	  cost=-1;
+	  num_points=0;
+	  }
+	  if (dest_eq_src)
+          cost = 0;
       fprintf(output, "%d %u\n", cost, num_points);
       Path *p_aux;
       while (path != NULL){
@@ -86,33 +90,39 @@ int main(int argc, char **argv){
       cost_acum=0;
       num_points=0;
       int null_point_in_path=1;
+      
+      if(num_tur_points!=1){
 
-      for(int i=0; i<num_tur_points-1; i=i+1){
-        if(map[tur_points[i][0]][tur_points[i][1]]==0){
-          null_point_in_path=0;
-          break;
-        }
-      }  
-
-      if(null_point_in_path){
         for(int i=0; i<num_tur_points-1; i=i+1){
-          if(tur_points[i][0] == tur_points[i+1][0] &&  tur_points[i][1] == tur_points[i+1][1])
-            continue;
-          cost = 0;
-          path = search(map, height, width, tur_points[i][0], tur_points[i][1],
-                              tur_points[i+1][0], tur_points[i+1][1], &cost, &num_points);
-
-          if(!cost){
-            cost_acum=-1;
-            num_points=0;
+          if(map[tur_points[i][0]][tur_points[i][1]]==0){
+            null_point_in_path=0;
             break;
           }
-          joinPaths(&whole_path, path);
-
-          cost_acum+=cost;
+        }  
+	    
+        if(null_point_in_path){
+          for(int i=0; i<num_tur_points-1; i=i+1){
+            if(tur_points[i][0] == tur_points[i+1][0] &&  tur_points[i][1] == tur_points[i+1][1])
+              continue;
+            cost = 0;
+            path = search(map, height, width, tur_points[i][0], tur_points[i][1],
+                                tur_points[i+1][0], tur_points[i+1][1], &cost, &num_points);
+	    
+            if(!cost){
+              cost_acum=-1;
+              num_points=0;
+              break;
+            }
+            joinPaths(&whole_path, path);
+	    
+            cost_acum+=cost;
+          }
         }
-      }
-
+	  }
+      
+      else
+        cost_acum=-1;
+        
       fprintf(output, "%d %u\n", cost_acum, num_points);
       Path *p_aux;
       while (whole_path != NULL){
