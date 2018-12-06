@@ -70,8 +70,8 @@ int main(int argc, char **argv){
                             tur_points[1][0], tur_points[1][1], &cost, &num_points);
       }    
 	  if(!cost){
-	  cost=-1;
-	  num_points=0;
+	    cost=-1;
+	    num_points=0;
 	  }
 	  if (dest_eq_src)
           cost = 0;
@@ -89,18 +89,19 @@ int main(int argc, char **argv){
       Path *whole_path = NULL;
       cost_acum=0;
       num_points=0;
-      int null_point_in_path=1;
+      int no_null_points_in_path=1;
       
       if(num_tur_points!=1){
 
-        for(int i=0; i<num_tur_points-1; i=i+1){
+        for(int i=0; i<num_tur_points; i=i+1){
           if(map[tur_points[i][0]][tur_points[i][1]]==0){
-            null_point_in_path=0;
+            no_null_points_in_path=0;
+            cost_acum=-1;
             break;
           }
         }  
 	    
-        if(null_point_in_path){
+        if(no_null_points_in_path){
           for(int i=0; i<num_tur_points-1; i=i+1){
             if(tur_points[i][0] == tur_points[i+1][0] &&  tur_points[i][1] == tur_points[i+1][1])
               continue;
@@ -119,7 +120,7 @@ int main(int argc, char **argv){
           }
         }
 	  }
-      
+   
       else
         cost_acum=-1;
         
