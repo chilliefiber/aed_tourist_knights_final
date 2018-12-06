@@ -20,38 +20,38 @@ int main(int argc, char **argv){
     fclose(input);
     exit (0);
   }
-  unsigned int width, height, num_tur_points, **tur_points = NULL, **map = NULL;
+   int width, height, num_tur_points, **tur_points = NULL, **map = NULL;
   char not_over;
   char valid_challenge;
-  unsigned int aux1, aux2, num_points;
+   int aux1, aux2, num_points;
   int cost, cost_acum;
   char objective;
   do {
-    if(fscanf(input, "%u", &height)!=1)
+    if(fscanf(input, "%d", &height)!=1)
       exit(0);
-    if(fscanf(input, "%u", &width)!=1)
+    if(fscanf(input, "%d", &width)!=1)
       exit(0);
     if(fscanf(input, " %c", &objective)!=1)
       exit(0);
-    if(fscanf(input, "%u", &num_tur_points)!=1)
+    if(fscanf(input, "%d", &num_tur_points)!=1)
       exit(0);
-    fprintf(output, "%u ", height);
-    fprintf(output, "%u ", width);
+    fprintf(output, "%d ", height);
+    fprintf(output, "%d ", width);
     fprintf(output, "%c ", objective);
-    fprintf(output, "%u ", num_tur_points);
+    fprintf(output, "%d ", num_tur_points);
     valid_challenge = 1;
     if (objective != 'A' && objective != 'B' && objective != 'C')
       valid_challenge = 0;
     if (valid_challenge)
-      tur_points = safeMalloc(sizeof(unsigned int*) * num_tur_points);
+      tur_points = safeMalloc(sizeof( int*) * num_tur_points);
     for (int point_ix = 0; point_ix < num_tur_points; point_ix++){
       if (valid_challenge){
-        tur_points[point_ix] = safeMalloc(sizeof(unsigned int) * 2);
-        if(fscanf(input, "%u %u", tur_points[point_ix], tur_points[point_ix] + 1)!=2)
+        tur_points[point_ix] = safeMalloc(sizeof( int) * 2);
+        if(fscanf(input, "%d %d", tur_points[point_ix], tur_points[point_ix] + 1)!=2)
           exit(0);
       }
       else{
-        if(fscanf(input, "%u %u", &aux1, &aux2)!=2)
+        if(fscanf(input, "%d %d", &aux1, &aux2)!=2)
           exit(0);
       }
     }
@@ -75,10 +75,10 @@ int main(int argc, char **argv){
 	  }
 	  if (dest_eq_src)
           cost = 0;
-      fprintf(output, "%d %u\n", cost, num_points);
+      fprintf(output, "%d %d\n", cost, num_points);
       Path *p_aux;
       while (path != NULL){
-        fprintf(output, "%u %u %u\n", path->coords.row, path->coords.column, map[path->coords.row][path->coords.column]);
+        fprintf(output, "%d %d %d\n", path->coords.row, path->coords.column, map[path->coords.row][path->coords.column]);
         p_aux = path;
         path = path->next;
         free(p_aux);
@@ -124,11 +124,11 @@ int main(int argc, char **argv){
       else
         cost_acum=-1;
         
-      fprintf(output, "%d %u\n", cost_acum, num_points);
+      fprintf(output, "%d %d\n", cost_acum, num_points);
       Path *p_aux;
       while (whole_path != NULL){
         if(num_points)
-          fprintf(output, "%u %u %u\n", whole_path->coords.row, whole_path->coords.column, map[whole_path->coords.row][whole_path->coords.column]);
+          fprintf(output, "%d %d %d\n", whole_path->coords.row, whole_path->coords.column, map[whole_path->coords.row][whole_path->coords.column]);
         p_aux = whole_path;
         whole_path = whole_path->next;
         free(p_aux);

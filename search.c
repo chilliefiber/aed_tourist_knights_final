@@ -4,7 +4,7 @@
 #include "graph.h"
 #include <stdio.h>
 #include <stdlib.h>
-Node ***createNodeMap(unsigned int _height, unsigned int _width){
+Node ***createNodeMap( int _height,  int _width){
   Node ***map = safeMalloc(sizeof(Node**) * _height);
   for (int row = 0; row < _height; row = row + 1){
     map[row] = safeMalloc(sizeof(Node*) * _width);
@@ -14,7 +14,7 @@ Node ***createNodeMap(unsigned int _height, unsigned int _width){
   return map;
 }
 
-void freeNodeMap(Node ***map, unsigned int _height, unsigned int _width){
+void freeNodeMap(Node ***map,  int _height,  int _width){
   for (int row = 0; row < _height; row = row + 1){
     for (int column = 0; column < _width; column = column + 1)
       free(map[row][column]);
@@ -23,10 +23,10 @@ void freeNodeMap(Node ***map, unsigned int _height, unsigned int _width){
   free(map);
 }
 
-Path *search(unsigned int **map, unsigned int _height, unsigned int _width,
-            unsigned int _origin_row, unsigned int _origin_column,
-            unsigned int _dest_row, unsigned int _dest_column,
-            int *cost, unsigned int *num_points){
+Path *search( int **map,  int _height,  int _width,
+             int _origin_row,  int _origin_column,
+             int _dest_row,  int _dest_column,
+            int *cost,  int *num_points){
   Node ***nodes = createNodeMap(_height, _width), *cur;
   nodes[_origin_row][_origin_column] = createNode(NULL, _origin_row, _origin_column, map);
   PQueue *q = createQueue(_height, _width);
@@ -50,7 +50,7 @@ Path *search(unsigned int **map, unsigned int _height, unsigned int _width,
   return shortest_path;
 }
 
-char explore(Node *p, Point *dest, unsigned int **map, unsigned int _height, unsigned int _width, Node ***nodes, PQueue *q){
+char explore(Node *p, Point *dest,  int **map,  int _height,  int _width, Node ***nodes, PQueue *q){
   char num_accessible_nodes;
   Point *points = accessibleNodes(&(p->coords), map, _height, _width, &num_accessible_nodes);
   Node *cur;
@@ -82,7 +82,7 @@ char explore(Node *p, Point *dest, unsigned int **map, unsigned int _height, uns
   return 0;
 }
 
-Point *accessibleNodes(Point *p, unsigned int **map, unsigned int _height, unsigned int _width, char *num_accessible_nodes){
+Point *accessibleNodes(Point *p,  int **map,  int _height,  int _width, char *num_accessible_nodes){
   *num_accessible_nodes = 0;
   Point points[8];
   validatePoint(map, _height, _width, num_accessible_nodes, points, p->row + 2, p->column + 1);
@@ -99,9 +99,9 @@ Point *accessibleNodes(Point *p, unsigned int **map, unsigned int _height, unsig
   return to_access;
 }
 
-void validatePoint(unsigned int **map, unsigned int _height, unsigned int _width,
+void validatePoint( int **map,  int _height,  int _width,
                    char *num_accessible_nodes, Point *points,
-                   unsigned int _row, unsigned int _column){
+                    int _row,  int _column){
   if (isValidPoint(_row, _column, _height, _width, map)){
     Point aux;
     aux.row = _row;

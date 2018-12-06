@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Node *createNode(Node *parent, unsigned int _row, unsigned int _column,
-                 unsigned int **map){
+Node *createNode(Node *parent,  int _row,  int _column,
+                  int **map){
   Node *new = safeMalloc(sizeof(Node));
   if (parent != NULL)
     new->cost = parent->cost  + map[_row][_column];
@@ -16,7 +16,7 @@ Node *createNode(Node *parent, unsigned int _row, unsigned int _column,
   return new;
 }
 
-PQueue *createQueue(unsigned int _height, unsigned int _width){
+PQueue *createQueue( int _height,  int _width){
   PQueue *q = safeMalloc(sizeof(PQueue));
   q->size = 0;
   q->heap = safeMalloc(sizeof(Node*) * _height * _width);
@@ -28,7 +28,7 @@ void freeQueue(PQueue *q){
   free(q);
 }
 
-Path *createPath(Node *cur, Path *previous, unsigned int _origin_row, unsigned int _origin_column, unsigned int *num_points){
+Path *createPath(Node *cur, Path *previous,  int _origin_row,  int _origin_column,  int *num_points){
   Path *p = safeMalloc(sizeof(Path));
   p->coords.row = cur->coords.row;
   p->coords.column = cur->coords.column;
@@ -56,58 +56,58 @@ void popRoot(PQueue *q){
   heapifyDown(q, 0);
 }
 
-void heapifyDown(PQueue *q , unsigned int ix){
-  unsigned int childIx;
+void heapifyDown(PQueue *q ,  int ix){
+   int childIx;
   while ((childIx = swapChildIndex(ix, q))){
     swap(ix, childIx, q->heap);
     ix = childIx;
   }
 }
 
-unsigned int smallerChildIndex(unsigned int ix, PQueue *q){
+ int smallerChildIndex( int ix, PQueue *q){
   if (!hasLeftChild(ix, q))
     return 0;
-  unsigned int smallerChildIx = leftChildIndex(ix);
+   int smallerChildIx = leftChildIndex(ix);
   if (hasRightChild(ix, q) && heapNodeCost(rightChildIndex(ix), q->heap) < heapNodeCost(smallerChildIx, q->heap))
     return rightChildIndex(ix);
   return smallerChildIx;
 }
 
-unsigned int swapChildIndex(unsigned int ix, PQueue *q){
-  unsigned int childIx = smallerChildIndex(ix, q);
+ int swapChildIndex( int ix, PQueue *q){
+   int childIx = smallerChildIndex(ix, q);
   if (!childIx)
     return 0;
   return heapNodeCost(childIx, q->heap) < heapNodeCost(ix, q->heap) ? childIx : 0;
 }
 
-unsigned int leftChildIndex(unsigned int ix){
+ int leftChildIndex( int ix){
   return ix * 2 + 1;
 }
 
-unsigned int rightChildIndex(unsigned int ix){
+ int rightChildIndex( int ix){
   return ix * 2 + 2;
 }
 
-char hasLeftChild(unsigned int ix, PQueue *q){
+char hasLeftChild( int ix, PQueue *q){
   return leftChildIndex(ix) < q->size;
 }
 
-char hasRightChild(unsigned int ix, PQueue *q){
+char hasRightChild( int ix, PQueue *q){
   return rightChildIndex(ix) < q->size;
 }
 
-void heapifyUp(PQueue *q, unsigned int ix){
+void heapifyUp(PQueue *q,  int ix){
   while (ix != 0 && parentCost(ix, q->heap) > heapNodeCost(ix, q->heap)){
     swapParent(ix, q->heap);
     ix = parentIndex(ix);
   }
 }
 
-void swapParent(unsigned int ix, Node **heap){
+void swapParent( int ix, Node **heap){
   swap(ix, parentIndex(ix), heap);
 }
 
-void swap(unsigned int ix0, unsigned int ix1, Node **heap){
+void swap( int ix0,  int ix1, Node **heap){
   Node *aux = heap[ix0];
   heap[ix0] = heap[ix1];
   heap[ix1] = aux;
@@ -116,23 +116,23 @@ void swap(unsigned int ix0, unsigned int ix1, Node **heap){
   heap[ix0]->ix = ix0;
 }
 
-unsigned int heapNodeCost(unsigned int ix, Node **heap){
+ int heapNodeCost( int ix, Node **heap){
   return heap[ix]->cost;
 }
 
-unsigned int parentCost(unsigned int ix, Node **heap){
+ int parentCost( int ix, Node **heap){
   return heapNodeCost(parentIndex(ix), heap);
 }
 
-unsigned int parentIndex(unsigned int ix){
-  return (unsigned int) ((ix-1)/2);
+ int parentIndex( int ix){
+  return ( int) ((ix-1)/2);
 }
 
 char empty(PQueue *q){
   return q->size == 0;
 }
 
-unsigned int newCost(unsigned int **map, Node *src, Point *dest){
+ int newCost( int **map, Node *src, Point *dest){
   return src->cost + map[dest->row][dest->column];
 }
 
