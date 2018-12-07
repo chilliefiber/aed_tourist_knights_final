@@ -5,6 +5,7 @@
 #include "pointers.h"
 #include "search.h"
 #include "structs.h"
+#include "graph.h"
 
 int main(int argc, char **argv){
   FILE *input = fopen(argv[1], "r");
@@ -94,7 +95,7 @@ int main(int argc, char **argv){
       if(num_tur_points!=1){
 
         for(int i=0; i<num_tur_points; i=i+1){
-          if(map[tur_points[i][0]][tur_points[i][1]]==0){
+          if(!isValidPoint(tur_points[i][0], tur_points[i][1], height, width, map)) {
             no_null_points_in_path=0;
             cost_acum=-1;
             break;
