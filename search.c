@@ -26,7 +26,7 @@ void freeNodeMap(Node ***map,  int _height,  int _width){
 Path *search( int **map,  int _height,  int _width,
              int _origin_row,  int _origin_column,
              int _dest_row,  int _dest_column,
-            int *cost,  int *num_points){
+            int *cost,  int *num_points, Path **previous_tail){
   Node ***nodes = createNodeMap(_height, _width), *cur;
   nodes[_origin_row][_origin_column] = createNode(NULL, _origin_row, _origin_column, map);
   PQueue *q = createQueue(_height, _width);
@@ -39,6 +39,15 @@ Path *search( int **map,  int _height,  int _width,
     // se chegámos ao fim
     if (nodes[_dest_row][_dest_column] != NULL){
       shortest_path = createPath(nodes[_dest_row][_dest_column], NULL, _origin_row, _origin_column, num_points);
+      // ligar os caminhos
+      if (*previous_tail != NULL){
+        (*previous_tail)->next = shortest_path;
+      }
+      Path *aux = shortest_path;
+      while(aux->next != NULL)
+        aux = aux->next;
+      // atualizar a cauda do caminho
+      *previous_tail = aux;
       *cost += nodes[_dest_row][_dest_column]->cost;
       break;
     }

@@ -73,12 +73,13 @@ int main(int argc, char **argv){
         num_points = 0;
         int dest_eq_src = 0;
         Path *path = NULL;
+        Path *aux = NULL;
         if (num_tur_points==2){
           dest_eq_src = tur_points[0][0] == tur_points[1][0] &&  tur_points[0][1] == tur_points[1][1];
           // se o ponto inicial é valido e o destino é diferente do inicio
           if (map[tur_points[0][0]][tur_points[0][1]] &&  !dest_eq_src)
             path = search(map, height, width, tur_points[0][0], tur_points[0][1],
-                              tur_points[1][0], tur_points[1][1], &cost, &num_points);
+                              tur_points[1][0], tur_points[1][1], &cost, &num_points, &aux);
         }    
        if(!cost){
           cost=-1;
@@ -96,8 +97,9 @@ int main(int argc, char **argv){
         }
       }
       else if(objective == 'B'){
-        Path *path;
+        //Path *path;
         Path *whole_path = NULL;
+        Path *tail = NULL;
         cost_acum=0;
         num_points=0;
         if(num_tur_points!=1){
@@ -105,14 +107,17 @@ int main(int argc, char **argv){
             if(tur_points[i][0] == tur_points[i+1][0] &&  tur_points[i][1] == tur_points[i+1][1])
               continue;
             cost = 0;
-            path = search(map, height, width, tur_points[i][0], tur_points[i][1],
-                                tur_points[i+1][0], tur_points[i+1][1], &cost, &num_points);
+            if (whole_path == NULL)
+              whole_path = search(map, height, width, tur_points[i][0], tur_points[i][1],
+                                tur_points[i+1][0], tur_points[i+1][1], &cost, &num_points, &tail);
+            else
+             /* path = */search(map, height, width, tur_points[i][0], tur_points[i][1],
+                                tur_points[i+1][0], tur_points[i+1][1], &cost, &num_points, &tail);
             if(!cost){
               cost_acum=-1;
               num_points=0;
               break;
             }
-            joinPaths(&whole_path, path);
             cost_acum+=cost;
           }
         } 
