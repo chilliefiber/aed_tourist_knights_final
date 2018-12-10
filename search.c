@@ -31,17 +31,15 @@ Path *search( int **map,  int _height,  int _width,
   nodes[_origin_row][_origin_column] = createNode(NULL, _origin_row, _origin_column, map);
   PQueue *q = createQueue(_height, _width);
   insert(q, nodes[_origin_row][_origin_column]);
-  Point dest;
-  dest.row = _dest_row;
-  dest.column = _dest_column;
-  char finished = 0;
   Path *shortest_path = NULL;
   while(!empty(q)){ // enquanto houver pontos para explorar
     cur = q->heap[0]; // ponto a explorar
     popRoot(q);
-    if ((finished = explore(cur, &dest, map, _height, _width, nodes, q))){
-      shortest_path = createPath(nodes[dest.row][dest.column], NULL, _origin_row, _origin_column, num_points);
-      *cost += nodes[dest.row][dest.column]->cost;
+    explore(cur, map, _height, _width, nodes, q);
+    // se chegámos ao fim
+    if (nodes[_dest_row][_dest_column] != NULL){
+      shortest_path = createPath(nodes[_dest_row][_dest_column], NULL, _origin_row, _origin_column, num_points);
+      *cost += nodes[_dest_row][_dest_column]->cost;
       break;
     }
   }
@@ -50,17 +48,36 @@ Path *search( int **map,  int _height,  int _width,
   return shortest_path;
 }
 
-char explore(Node *p, Point *dest,  int **map,  int _height,  int _width, Node ***nodes, PQueue *q){
+void fillNode(int ix, HyperNode *graph, int **map, int _height, int _width, int **tur_points, int num_tur_points){
+  initHyperNode(ix, graph, map, num_tur_points, tur_points);
+  Node ***nodes = createNodeMap(_height, _width), *cur;
+  nodes[tur_points[ix][0]][tur_points[ix][1]] = createNode(NULL, tur_points[ix][0], tur_points[ix][1], map); 
+  PQueue *q = createQueue(_height, _width);
+  insert(q, nodes[tur_points[ix][0]][tur_points[ix][1]]);
+  int num_found_points = 0, num_points_to_find = num_tur_points - ix - 1, num_points_in_path;
+  while(!empty(q) && num_found_points != num_points_to_find){
+    cur = q->heap[0];
+    popRoot(q);
+    explore(cur, map, _height, _width, nodes, q);
+    for (int i = ix + 1; i < num_tur_points; i = i + 1){
+      // se chegámos a um novo ponto de destino
+      if(nodes[tur_points[i][0]][tur_points[i][1]] != NULL && graph[ix].edges[i] == NULL){
+        num_points_in_path = 0;
+        num_found_points = num_found_points + 1;
+        Path *p = createPath(nodes[tur_points[i][0]][tur_points[i][1]], NULL, tur_points[ix][0], tur_points[ix][1], &num_points_in_path);
+        graph[ix].edges[i] = createEdge(p, nodes[tur_points[i][0]][tur_points[i][1]]->cost, num_points_in_path);
+      }
+    }
+  }
+  freeNodeMap(nodes, _height, _width);
+  freeQueue(q);
+}
+
+void explore(Node *p,  int **map,  int _height,  int _width, Node ***nodes, PQueue *q){
   char num_accessible_nodes;
   Point *points = accessibleNodes(&(p->coords), map, _height, _width, &num_accessible_nodes);
   Node *cur;
   for (int i = 0; i < num_accessible_nodes; i = i + 1){
-    // se chegámos ao destino
-    if (points[i].row == dest->row && points[i].column == dest->column){
-      nodes[dest->row][dest->column] = createNode(p, dest->row, dest->column, map);
-      free(points);
-      return 1;
-    }
     cur = nodes[points[i].row][points[i].column];
     // se for a primeira vez que visitamos este ponto, criamos um nó para o mapa de nós
     // e inserimos o nó na heap
@@ -79,7 +96,6 @@ char explore(Node *p, Point *dest,  int **map,  int _height,  int _width, Node *
     }
   }
   free(points);
-  return 0;
 }
 
 Point *accessibleNodes(Point *p,  int **map,  int _height,  int _width, char *num_accessible_nodes){
@@ -110,3 +126,37 @@ void validatePoint( int **map,  int _height,  int _width,
     *num_accessible_nodes = (*num_accessible_nodes) + 1;
   }
 }
+
+void checkPermutations(HyperNode *graph, int *cost, int *num_points, int *permutation, int size, int n, int *answer){
+  // Calcular o custo desta permutação
+  if (size == 1){
+    int cur_cost = graph[0].edges[permutation[0]]->cost;
+    int cur_num_points = graph[0].edges[permutation[0]]->num_points;
+    // iterar pelos nós todos
+    for (int i = 1; i < n; i = i + 1){
+      cur_cost = cur_cost + graph[permutation[i-1]].edges[permutation[i]]->cost;
+      cur_num_points = cur_num_points + graph[permutation[i-1]].edges[permutation[i]]->num_points;
+    }
+    // esta permutação tem um custo inferior ao mínimo custo encontrado até agora
+    if (*cost == -1 || cur_cost < *cost){
+      *cost = cur_cost;
+      *num_points = cur_num_points;
+      for (int i = 0; i < n; i++)
+        answer[i] = permutation[i];
+    }
+  }
+  for (int i = 0; i < size; i++){
+    checkPermutations(graph, cost, num_points, permutation, size - 1, n, answer);
+    if (size % 2 == 1){
+      int aux = permutation[0];
+      permutation[0] = permutation[size - 1];
+      permutation[size - 1] = aux;
+    }
+    else{
+      int aux = permutation[i];
+      permutation[i] = permutation[size - 1];
+      permutation[size - 1] = aux;
+    }
+  }
+}
+ 

@@ -29,10 +29,7 @@ void freeQueue(PQueue *q){
 }
 
 Path *createPath(Node *cur, Path *previous,  int _origin_row,  int _origin_column,  int *num_points){
-  Path *p = safeMalloc(sizeof(Path));
-  p->coords.row = cur->coords.row;
-  p->coords.column = cur->coords.column;
-  p->next = previous;
+  Path *p = initPath(cur->coords.row, cur->coords.column, previous);
   *num_points = *(num_points) + 1;
   // se chegámos ao primeiro ponto do caminho
   if (cur->parent->coords.row == _origin_row && cur->parent->coords.column == _origin_column)
@@ -41,6 +38,28 @@ Path *createPath(Node *cur, Path *previous,  int _origin_row,  int _origin_colum
 }
 
 
+Path *reversePath(Path *previous_path, int **tur_points, int new_dest_ix, int new_src_ix){
+  Path *p = initPath(tur_points[new_dest_ix][0], tur_points[new_dest_ix][1], NULL);
+  Path *reverse = traversePath(p, tur_points, new_src_ix, previous_path);
+  return reverse;
+}
+
+Path *initPath(int row, int column, Path *next){
+  Path *p = safeMalloc(sizeof(Path));
+  p->coords.row = row;
+  p->coords.column = column;
+  p->next = next;
+  return p;
+}
+
+Path *traversePath(Path *previous, int **tur_points, int new_src_ix, Path *old){
+  Path *new = initPath(old->coords.row, old->coords.column, previous);
+  // se o próximo nó é o novo início/antigo destino, chegámos ao fim
+  // se o próximo nó é NULL, quer dizer que só havia 1 passo no caminho e também chegámos ao fim
+  if (old->next == NULL || (old->next->coords.row == tur_points[new_src_ix][0] && old->next->coords.column == tur_points[new_src_ix][1]))
+    return new;
+  return traversePath(new, tur_points, new_src_ix, old->next);
+}
 
 void insert(PQueue *q, Node *n){
   q->heap[q->size] = n;
@@ -148,4 +167,29 @@ void joinPaths(Path **whole_path, Path *path){
     curr=curr->next;
 
   curr->next=path;
+}
+
+void initHyperNode(int ix, HyperNode *graph, int **map, int num_tur_points, int **tur_points){
+  HyperNode *cur = graph + ix;
+  cur->edges = safeMalloc(sizeof(Edge*) * num_tur_points);
+  cur->edges[ix] = NULL; // não é preciso uma estrutura para o proprio ponto
+  // iterar pelos nós correspondentes aos pontos aos quais ainda não aplicámos Dijkstra
+  for (int i = ix + 1; i < num_tur_points; i++)
+    cur->edges[i] = NULL;
+  // iterar pelos nós correspondentes aos pontos aos quais já aplicámos Dijkstra
+  for (int i = ix - 1; i > -1; i--)
+    // o custo será igual ao custo do caminho contrário menos o custo de chegar a cur
+    // mais o custo de chegar ao outro ponto
+    cur->edges[i] = createEdge(reversePath(graph[i].edges[ix]->path, tur_points, i, ix), 
+                              graph[i].edges[ix]->cost - map[tur_points[ix][0]][tur_points[ix][1]] + 
+                         map[tur_points[i][0]][tur_points[i][1]],
+                         graph[i].edges[ix]->num_points); 
+}
+
+Edge *createEdge(Path *p, int cost, int num_points){
+  Edge *new = safeMalloc(sizeof(Edge));
+  new->path = p;
+  new->cost = cost;
+  new->num_points = num_points;
+  return new;
 }

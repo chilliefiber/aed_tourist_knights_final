@@ -57,82 +57,127 @@ int main(int argc, char **argv){
       }
     }
     map = createMap(input, width, height, valid_challenge);
-    if (objective == 'A'){
-      cost = 0;
-      num_points = 0;
-      int dest_eq_src = 0;
-      Path *path = NULL;
-      
-      if (num_tur_points==2){
-        dest_eq_src = tur_points[0][0] == tur_points[1][0] &&  tur_points[0][1] == tur_points[1][1];
-        // se o ponto inicial é valido e o destino é diferente do inicio
-        if (map[tur_points[0][0]][tur_points[0][1]] &&  !dest_eq_src)
-          path = search(map, height, width, tur_points[0][0], tur_points[0][1],
-                            tur_points[1][0], tur_points[1][1], &cost, &num_points);
-      }    
-	  if(!cost){
-	    cost=-1;
-	    num_points=0;
-	  }
-	  if (dest_eq_src)
-          cost = 0;
-      fprintf(output, "%d %d\n", cost, num_points);
-      Path *p_aux;
-      while (path != NULL){
-        fprintf(output, "%d %d %d\n", path->coords.row, path->coords.column, map[path->coords.row][path->coords.column]);
-        p_aux = path;
-        path = path->next;
-        free(p_aux);
+    if (valid_challenge){
+      for(int i=0; i<num_tur_points; i=i+1){
+        if(!isValidPoint(tur_points[i][0], tur_points[i][1], height, width, map)) {
+          valid_challenge = 0;
+          freeTurPoints(num_tur_points, &tur_points);
+          freeCostMap(&map, height);
+          break;
+        }
       }
     }
-    else if(objective == 'B'){
-      Path *path;
-      Path *whole_path = NULL;
-      cost_acum=0;
-      num_points=0;
-      int no_null_points_in_path=1;
-      
-      if(num_tur_points!=1){
-
-        for(int i=0; i<num_tur_points; i=i+1){
-          if(!isValidPoint(tur_points[i][0], tur_points[i][1], height, width, map)) {
-            no_null_points_in_path=0;
-            cost_acum=-1;
-            break;
-          }
-        }  
-	    
-        if(no_null_points_in_path){
+    if (valid_challenge){
+      if (objective == 'A'){
+        cost = 0;
+        num_points = 0;
+        int dest_eq_src = 0;
+        Path *path = NULL;
+        if (num_tur_points==2){
+          dest_eq_src = tur_points[0][0] == tur_points[1][0] &&  tur_points[0][1] == tur_points[1][1];
+          // se o ponto inicial é valido e o destino é diferente do inicio
+          if (map[tur_points[0][0]][tur_points[0][1]] &&  !dest_eq_src)
+            path = search(map, height, width, tur_points[0][0], tur_points[0][1],
+                              tur_points[1][0], tur_points[1][1], &cost, &num_points);
+        }    
+       if(!cost){
+          cost=-1;
+          num_points=0;
+        }
+        if (dest_eq_src)
+          cost = 0;
+        fprintf(output, "%d %d\n", cost, num_points);
+        Path *p_aux;
+        while (path != NULL){
+          fprintf(output, "%d %d %d\n", path->coords.row, path->coords.column, map[path->coords.row][path->coords.column]);
+          p_aux = path;
+          path = path->next;
+          free(p_aux);
+        }
+      }
+      else if(objective == 'B'){
+        Path *path;
+        Path *whole_path = NULL;
+        cost_acum=0;
+        num_points=0;
+        if(num_tur_points!=1){
           for(int i=0; i<num_tur_points-1; i=i+1){
             if(tur_points[i][0] == tur_points[i+1][0] &&  tur_points[i][1] == tur_points[i+1][1])
               continue;
             cost = 0;
             path = search(map, height, width, tur_points[i][0], tur_points[i][1],
                                 tur_points[i+1][0], tur_points[i+1][1], &cost, &num_points);
-	    
             if(!cost){
               cost_acum=-1;
               num_points=0;
               break;
             }
             joinPaths(&whole_path, path);
-	    
             cost_acum+=cost;
           }
+        } 
+        else
+          cost_acum=-1; 
+        fprintf(output, "%d %d\n", cost_acum, num_points);
+        Path *p_aux;
+        while (whole_path != NULL){
+          if(num_points)
+            fprintf(output, "%d %d %d\n", whole_path->coords.row, whole_path->coords.column, map[whole_path->coords.row][whole_path->coords.column]);
+          p_aux = whole_path;
+          whole_path = whole_path->next;
+          free(p_aux);
         }
-	  }
-   
-      else
-        cost_acum=-1;
-        
-      fprintf(output, "%d %d\n", cost_acum, num_points);
-      Path *p_aux;
-      while (whole_path != NULL){
-        if(num_points)
-          fprintf(output, "%d %d %d\n", whole_path->coords.row, whole_path->coords.column, map[whole_path->coords.row][whole_path->coords.column]);
-        p_aux = whole_path;
-        whole_path = whole_path->next;
-        free(p_aux);
+      }
+      else if (objective == 'C'){
+        tur_points = removeDuplicates(tur_points, &num_tur_points);
+        HyperNode *graph = NULL;
+        char possible = 1;
+        if (num_tur_points < 2)
+          possible = 0;
+          // verificar se o caminho é possível
+        if (possible){
+          graph = safeMalloc(sizeof(HyperNode) * num_tur_points); 
+          fillNode(0, graph, map, height, width, tur_points, num_tur_points);
+          for (int i = 1; i < num_tur_points;i = i + 1){
+            if (graph[0].edges[i] == NULL){
+              possible = 0;
+              freeHyperNode(graph[0], num_tur_points);
+              free(graph);
+              break;
+            }
+          }
+        }
+        if (!possible)
+          fprintf(output, "-1 0\n");
+        else{
+          for (int i = 1; i < num_tur_points; i = i +1)
+            fillNode(i, graph, map, height, width, tur_points, num_tur_points);
+          int cost = -1;
+          int num_points;
+          int *order = safeMalloc(sizeof(int) * (num_tur_points - 1)); // guarda os indices dos pontos turisticos todos menos da origem
+          int *best_order = safeMalloc(sizeof(int) * (num_tur_points - 1)); // guarda a melhor permutação
+          for (int i = 0; i < num_tur_points - 1; i = i + 1)
+            order[i] = i + 1;      
+          checkPermutations(graph, &cost, &num_points, order, num_tur_points - 1, num_tur_points - 1, best_order);
+          fprintf(output, "%d %d\n", cost, num_points);
+          cost = 0;
+          // iterar pelos pontos turisticos todos menos o ultimo
+          Path *p;
+          int previous_ix = 0;
+          for (int i = 0; i < num_tur_points - 1; i = i + 1){
+            // iterar pelos pontos da aresta
+            p = graph[previous_ix].edges[best_order[i]]->path;
+            while (p != NULL){
+              fprintf(output, "%d %d %d\n", p->coords.row, p->coords.column, map[p->coords.row][p->coords.column]);     
+              cost += map[p->coords.row][p->coords.column];
+              p = p->next;
+            }
+            previous_ix = best_order[i];
+          }
+          freeGraph(graph, num_tur_points);
+          free(order);
+          free(best_order);
+        }
       }
     }
     else

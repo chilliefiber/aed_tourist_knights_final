@@ -22,6 +22,16 @@ typedef struct Path{
   struct Path *next;
 } Path;
 
+typedef struct Edge{
+  int cost;
+  int num_points;
+  Path *path;
+} Edge;
+
+typedef struct HyperNode{
+  Edge **edges;
+} HyperNode;
+
 Node *createNode(Node *parent,  int _row,  int _column,
                   int **map);
 PQueue *createQueue( int _height,  int _width);
@@ -46,6 +56,10 @@ char empty(PQueue *q);
  int newCost( int **map, Node *src, Point *dest);
  int heapNodeCost( int ix, Node **heap);
 Path *createPath(Node *cur, Path *previous,  int _origin_row,  int _origin_column,  int *num_points);
+Path *reversePath(Path *previous_path, int **tur_points, int new_dest_ix, int new_src_ix);
+Path *initPath(int row, int column, Path *next);
+Path *traversePath(Path *previous, int **tur_points, int new_src_ix, Path *old);
 void joinPaths(Path **whole_path, Path *path);
-
+Edge *createEdge(Path *p, int cost, int num_points);
+void initHyperNode(int ix, HyperNode *graph, int **map, int num_tur_points, int **tur_points);
 #endif

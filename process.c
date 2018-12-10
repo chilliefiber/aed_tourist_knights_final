@@ -50,3 +50,28 @@ char *outputName(char *input_name){
   input_name[input_length - strlen(".cities")] = c;
   return output_name;
 }
+
+int **removeDuplicates(int **tur_points, int *num_tur_points){
+  int **no_dups = safeMalloc(*num_tur_points * sizeof(int*));
+  int num_no_dups = 0;
+  char dup;
+  for (int i = 0; i < *num_tur_points; i = i + 1){
+    dup = 0;
+    for (int j = 0; j < num_no_dups; j++){
+      if (tur_points[i][0] == no_dups[j][0] && tur_points[i][1] == no_dups[j][1]){
+        dup = 1;
+        break;
+      }
+    }
+    if (!dup){
+      no_dups[num_no_dups] = safeMalloc(2 * sizeof(int));
+      no_dups[num_no_dups][0] = tur_points[i][0];
+      no_dups[num_no_dups][1] = tur_points[i][1];
+      num_no_dups = num_no_dups + 1;
+    }
+    free(tur_points[i]); 
+  }
+  free(tur_points);
+  *num_tur_points = num_no_dups;
+  return no_dups;
+}
