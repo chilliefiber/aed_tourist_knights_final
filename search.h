@@ -14,5 +14,7 @@ Point *accessibleNodes(Point *p,  int **map,  int _height,  int _width, char *nu
 void validatePoint( int **map,  int _height,  int _width, 
                    char *num_points_to_explore, Point *points,
                     int _row,  int _column);
-void checkPermutations(HyperNode *graph, int *cost, int *num_points, int *permutation, int size, int n, int *answer);
+void checkPermutations(HyperNode *graph, int *best_cost, int *num_points, int size, int *answer, int *visited, int *permutation,
+                       int depth, int cost_acum);
+int pathCost(HyperNode *graph, int *permutation, int size);
 #endif

@@ -161,9 +161,11 @@ int main(int argc, char **argv){
           int num_points;
           int *order = safeMalloc(sizeof(int) * (num_tur_points - 1)); // guarda os indices dos pontos turisticos todos menos da origem
           int *best_order = safeMalloc(sizeof(int) * (num_tur_points - 1)); // guarda a melhor permutação
+          int *visited = safeMalloc(sizeof(int) * (num_tur_points - 1));
           for (int i = 0; i < num_tur_points - 1; i = i + 1)
-            order[i] = i + 1;      
-          checkPermutations(graph, &cost, &num_points, order, num_tur_points - 1, num_tur_points - 1, best_order);
+            visited[i] = 0;     
+          checkPermutations(graph, &cost, &num_points, num_tur_points - 1, best_order, visited, order,
+                       0, 0); 
           fprintf(output, "%d %d\n", cost, num_points);
           cost = 0;
           // iterar pelos pontos turisticos todos menos o ultimo
@@ -182,6 +184,7 @@ int main(int argc, char **argv){
           freeGraph(graph, num_tur_points);
           free(order);
           free(best_order);
+          free(visited);
         }
       }
     }

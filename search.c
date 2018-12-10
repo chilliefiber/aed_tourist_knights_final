@@ -136,36 +136,51 @@ void validatePoint( int **map,  int _height,  int _width,
   }
 }
 
-void checkPermutations(HyperNode *graph, int *cost, int *num_points, int *permutation, int size, int n, int *answer){
-  // Calcular o custo desta permutação
-  if (size == 1){
-    int cur_cost = graph[0].edges[permutation[0]]->cost;
-    int cur_num_points = graph[0].edges[permutation[0]]->num_points;
-    // iterar pelos nós todos
-    for (int i = 1; i < n; i = i + 1){
-      cur_cost = cur_cost + graph[permutation[i-1]].edges[permutation[i]]->cost;
-      cur_num_points = cur_num_points + graph[permutation[i-1]].edges[permutation[i]]->num_points;
+void checkPermutations(HyperNode *graph, int *best_cost, int *num_points, int size, int *answer, int *visited, int *permutation,
+                       int depth, int cost_acum){
+  int temp_cost = 0;
+  int aux_cost;
+  // se temos uma permutação completa cujo custo é inferior ao custo mínimo encontrado até agora
+  if (depth == size && ((aux_cost = pathCost(graph, permutation, size)) < *best_cost || *best_cost == -1 )){
+    *best_cost = aux_cost; // atualizar o custo
+    *num_points = 0;
+    int previous_ix = 0;
+    // atualizar a melhor permutação e o número de pontos no caminho
+    for (int i = 0; i < size; i++){
+      answer[i] = permutation[i];
+      *num_points = *num_points + graph[previous_ix].edges[permutation[i]]->num_points;
+      previous_ix = permutation[i];
     }
-    // esta permutação tem um custo inferior ao mínimo custo encontrado até agora
-    if (*cost == -1 || cur_cost < *cost){
-      *cost = cur_cost;
-      *num_points = cur_num_points;
-      for (int i = 0; i < n; i++)
-        answer[i] = permutation[i];
-    }
+    return;
   }
   for (int i = 0; i < size; i++){
-    checkPermutations(graph, cost, num_points, permutation, size - 1, n, answer);
-    if (size % 2 == 1){
-      int aux = permutation[0];
-      permutation[0] = permutation[size - 1];
-      permutation[size - 1] = aux;
+    if (!visited[i] && depth == 0){
+      temp_cost = graph[0].edges[i+1]->cost;
+      if (temp_cost + cost_acum < *best_cost || *best_cost == -1){
+        visited[i] = 1;
+        permutation[depth] = i+1;
+        checkPermutations(graph, best_cost, num_points, size, answer, visited, permutation,depth + 1, temp_cost + cost_acum);
+        visited[i] = 0;
+      }
     }
-    else{
-      int aux = permutation[i];
-      permutation[i] = permutation[size - 1];
-      permutation[size - 1] = aux;
+    if (!visited[i] && depth){
+      temp_cost = graph[permutation[depth-1]].edges[i+1]->cost;
+      if (temp_cost + cost_acum < *best_cost || *best_cost == -1){
+        visited[i] = 1;
+        permutation[depth] = i + 1;
+        checkPermutations(graph, best_cost, num_points, size, answer, visited, permutation,depth + 1, temp_cost + cost_acum);
+        visited[i] = 0;
+      }
     }
   }
 }
- 
+
+int pathCost(HyperNode *graph, int *permutation, int size){
+  int previous_ix = 0;
+  int cost = 0;
+  for (int i = 0; i < size; i = i + 1){
+    cost = cost + graph[previous_ix].edges[permutation[i]]->cost;
+    previous_ix = permutation[i];
+  }
+  return cost;
+}
