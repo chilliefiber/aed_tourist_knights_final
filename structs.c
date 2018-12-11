@@ -3,6 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/**
+ * alloca memoria para um "Node" e preenche
+ * os seus campos com os dados respetivos (argumentos
+ * @return      ponteiro para o nodo criado
+ */
 Node *createNode(Node *parent,  int _row,  int _column,
                   int **map){
   Node *new = safeMalloc(sizeof(Node));
@@ -16,6 +21,10 @@ Node *createNode(Node *parent,  int _row,  int _column,
   return new;
 }
 
+/**
+ * alloca memoria para a estrutura basilar da fila
+ * @return         ponteiro para a fila
+ */
 PQueue *createQueue( int _height,  int _width){
   PQueue *q = safeMalloc(sizeof(PQueue));
   q->size = 0;
@@ -23,6 +32,10 @@ PQueue *createQueue( int _height,  int _width){
   return q;
 }
 
+/**
+ * AQUI
+ * @param q [description]
+ */
 void freeQueue(PQueue *q){
   free(q->heap);
   free(q);
@@ -155,6 +168,11 @@ char empty(PQueue *q){
   return src->cost + map[dest->row][dest->column];
 }
 
+/**
+ * AQUI
+ * @param whole_path [description]
+ * @param path       [description]
+ */
 void joinPaths(Path **whole_path, Path *path){
   if(*whole_path==NULL){
     *whole_path=path;
@@ -180,10 +198,10 @@ void initHyperNode(int ix, HyperNode *graph, int **map, int num_tur_points, int 
   for (int i = ix - 1; i > -1; i--)
     // o custo será igual ao custo do caminho contrário menos o custo de chegar a cur
     // mais o custo de chegar ao outro ponto
-    cur->edges[i] = createEdge(reversePath(graph[i].edges[ix]->path, tur_points, i, ix), 
-                              graph[i].edges[ix]->cost - map[tur_points[ix][0]][tur_points[ix][1]] + 
+    cur->edges[i] = createEdge(reversePath(graph[i].edges[ix]->path, tur_points, i, ix),
+                              graph[i].edges[ix]->cost - map[tur_points[ix][0]][tur_points[ix][1]] +
                          map[tur_points[i][0]][tur_points[i][1]],
-                         graph[i].edges[ix]->num_points); 
+                         graph[i].edges[ix]->num_points);
 }
 
 Edge *createEdge(Path *p, int cost, int num_points){

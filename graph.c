@@ -2,6 +2,10 @@
 #include "pointers.h"
 #include <stdlib.h>
 
+/**
+ * verifica se um dado ponto esta dentro do mapa
+ * e se o seu custo não é nulo
+ */
 int isValidPoint( int _row,  int _column,
                   int _height,  int _width,
                   int **map){
@@ -10,5 +14,3 @@ int isValidPoint( int _row,  int _column,
     return 0;
   return 1;
 }
-
-
