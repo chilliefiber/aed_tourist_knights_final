@@ -87,7 +87,17 @@ Path *search( int **map,  int _height,  int _width,
   return shortest_path;
 }
 
-
+/**
+ * [fillNode description]
+ * @param ix             indice do ponto de origem
+ * @param graph          grafo que tem os pontos turisticos e as arestas que
+ * os ligam. ponderado e direcionado
+ * @param map            mapa dos custos
+ * @param _height
+ * @param _width
+ * @param tur_points
+ * @param num_tur_points
+ */
 void fillNode(int ix, HyperNode *graph, int **map, int _height, int _width, int **tur_points, int num_tur_points){
   initHyperNode(ix, graph, map, num_tur_points, tur_points);
   Node ***nodes = createNodeMap(_height, _width), *cur;
@@ -235,7 +245,9 @@ void checkPermutations(HyperNode *graph, int *best_cost, int *num_points, int si
     }
   }
 }
-
+/**
+ * calcula o custo do caminho de uma permutacao
+ */
 int pathCost(HyperNode *graph, int *permutation, int size){
   int previous_ix = 0;
   int cost = 0;

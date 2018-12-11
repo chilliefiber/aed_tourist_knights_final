@@ -1,10 +1,19 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
+/**
+ * guarda coordenadas de um ponto no mapa
+ **/
 typedef struct Point{
    int row;
    int column;
 } Point;
 
+/**
+ * guarda as coordenadas de um ponto, o custo para o atingir
+ * partindo da origem e um ponteiro para o Node do ponto que o
+ * precede. aquando a sua inserção no acervo é lhe atribuido um
+ * indice que facilita acessos futuros
+ */
 typedef struct Node{
   struct Node *parent;
   Point coords;
@@ -12,16 +21,29 @@ typedef struct Node{
    int ix;
 } Node;
 
+/**
+ *  tipo usado para gurdar a lista prioritaria.
+ *  mantem a um int com a sua dimensao e a lista
+ *  esta implementada como um acervo assente num
+ *  vetor de ponteiros para Node's, acima descritos
+ */
 typedef struct PQueue{
    int size;
   Node **heap;
 } PQueue;
 
+/**
+ * no para uma lista simplesmente ligada destinada
+ * a registar caminhos
+ */
 typedef struct Path{
   Point coords;
   struct Path *next;
 } Path;
 
+/**
+ *
+ */
 typedef struct Edge{
   int cost;
   int num_points;

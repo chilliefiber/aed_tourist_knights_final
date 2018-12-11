@@ -41,6 +41,19 @@ void freeQueue(PQueue *q){
   free(q);
 }
 
+/**
+ * obtencao, recursiva, do caminho otimo a partir do ponto de destino.
+ * "recua-se" sucessivamente, no mapa de nos, para o ponto a partir do
+ * qual se atingiu o atual até chegar à origem. no processo, registam-se
+ * os pontos numa lista que, no final, representa a totalidade do caminho
+ * @param  cur            1a chamada - ponto de destino, restantes - ponto atual,
+ * ultima - ponto de partida
+ * @param  previous       1a chamada - NULL, restantes - ponto seguinte no caminho final
+ * @param  _origin_row    coordenada do ponto a que a recursao pretende chegar (origem)
+ * @param  _origin_column coordenada do ponto a que a recursao pretende chegar (origem)
+ * @param  num_points     numero de pontos do caminho
+ * @return                ponteiro para lista que regista o caminho mais curto 
+ */
 Path *createPath(Node *cur, Path *previous,  int _origin_row,  int _origin_column,  int *num_points){
   Path *p = initPath(cur->coords.row, cur->coords.column, previous);
   *num_points = *(num_points) + 1;
