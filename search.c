@@ -4,6 +4,13 @@
 #include "graph.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+/**
+ * inicializa tabela (das dims do mapa) de ponteiros para Node's
+ * @param  _height altura do mapa
+ * @param  _width  largura do mapa
+ * @return         ponteiro para a tabela
+ */
 Node ***createNodeMap( int _height,  int _width){
   Node ***map = safeMalloc(sizeof(Node**) * _height);
   for (int row = 0; row < _height; row = row + 1){
@@ -14,6 +21,12 @@ Node ***createNodeMap( int _height,  int _width){
   return map;
 }
 
+/**
+ * libeta memoria alocada para a tabela de Node's
+ * @param map     ponteiro para
+ * @param _height altura do mapa
+ * @param _width  largura do mapa
+ */
 void freeNodeMap(Node ***map,  int _height,  int _width){
   for (int row = 0; row < _height; row = row + 1){
     for (int column = 0; column < _width; column = column + 1)
@@ -23,6 +36,23 @@ void freeNodeMap(Node ***map,  int _height,  int _width){
   free(map);
 }
 
+/**
+ * detemina caminho mais curto entre dois pontos
+ * implementa em conjunto com a func. explore()
+ * o algoritmo de dijkstra com uma lista prioritaria
+ * na forma de acervo/heap
+ * @param  map            tabela dos custos
+ * @param  _height        altura do mapa
+ * @param  _width         largura do mapa
+ * @param  _origin_row    coordenada y do ponto inicial
+ * @param  _origin_column coordenada x do ponto inicial
+ * @param  _dest_row      coordenada y do ponto inicial
+ * @param  _dest_column   coordenada x do ponto inicial
+ * @param  cost           custo do caminho já percorrido (Var. B)
+ * @param  num_points     numero de pontos do caminho já percorrido (Var. B)
+ * @param  previous_tail  cauda da lista que guarda o caminho já percorrido (Var. B)
+ * @return                caminho mais curto determinado
+ */
 Path *search( int **map,  int _height,  int _width,
              int _origin_row,  int _origin_column,
              int _dest_row,  int _dest_column,
@@ -57,10 +87,21 @@ Path *search( int **map,  int _height,  int _width,
   return shortest_path;
 }
 
+/**
+ * aplica o dijkstra e preenche o nó do hipergrafo
+ * @param ix             indice do ponto de origem
+ * @param graph          grafo que tem os pontos turisticos e as arestas que
+ * os ligam. ponderado e direcionado
+ * @param map            mapa dos custos
+ * @param _height        largura do mapa dos custos
+ * @param _width         altura do mapa dos custos
+ * @param tur_points       pontos a visitar
+ * @param num_tur_points   numero de pontos a visitar
+ */
 void fillNode(int ix, HyperNode *graph, int **map, int _height, int _width, int **tur_points, int num_tur_points){
   initHyperNode(ix, graph, map, num_tur_points, tur_points);
   Node ***nodes = createNodeMap(_height, _width), *cur;
-  nodes[tur_points[ix][0]][tur_points[ix][1]] = createNode(NULL, tur_points[ix][0], tur_points[ix][1], map); 
+  nodes[tur_points[ix][0]][tur_points[ix][1]] = createNode(NULL, tur_points[ix][0], tur_points[ix][1], map);
   PQueue *q = createQueue(_height, _width);
   insert(q, nodes[tur_points[ix][0]][tur_points[ix][1]]);
   int num_found_points = 0, num_points_to_find = num_tur_points - ix - 1, num_points_in_path;
@@ -82,6 +123,17 @@ void fillNode(int ix, HyperNode *graph, int **map, int _height, int _width, int 
   freeQueue(q);
 }
 
+
+/**
+ * explora os pontos à volta de "p" e atualiza a lista de prioridades com os
+ * melhores custos
+ * @param p       ponto a partir do qual se faz a busca
+ * @param map     tebela dos custos
+ * @param _height altura do mapa
+ * @param _width  largura do mapa
+ * @param nodes   mapa de nós
+ * @param q       lista prioritaria - heap
+ */
 void explore(Node *p,  int **map,  int _height,  int _width, Node ***nodes, PQueue *q){
   char num_accessible_nodes;
   Point *points = accessibleNodes(&(p->coords), map, _height, _width, &num_accessible_nodes);
@@ -107,6 +159,15 @@ void explore(Node *p,  int **map,  int _height,  int _width, Node ***nodes, PQue
   free(points);
 }
 
+/**
+ * gera um vetor com os pontos acessiveis a partir de "p"
+ * @param  p                    ponto a partir do qual se faz a busca
+ * @param  map                  tabela dos custos
+ * @param  _height              altura do mapa
+ * @param  _width               largura do mapa
+ * @param  num_accessible_nodes numero de pontos acessiveis partindo de p
+ * @return                      vetor de Node's de Point's(struct das coordenadas) acessiveis
+ */
 Point *accessibleNodes(Point *p,  int **map,  int _height,  int _width, char *num_accessible_nodes){
   *num_accessible_nodes = 0;
   Point points[8];
@@ -124,6 +185,17 @@ Point *accessibleNodes(Point *p,  int **map,  int _height,  int _width, char *nu
   return to_access;
 }
 
+/**
+ * guarda o ponto no vetor acima descrito se este for valido
+ * (dentro do mapa e com custo !=0)
+ * @param  map                 tabela dos custos
+ * @param  _height             altura do mapa
+ * @param  _width              largura do mapa
+ * @param num_accessible_nodes numero de pontos asseciveis part de p
+ * @param points               vetor auxiliar onde se guarda o ponto se for acessivel
+ * @param _row                 coord. ponto a validar
+ * @param _column              coord. ponto a validar
+ */
 void validatePoint( int **map,  int _height,  int _width,
                    char *num_accessible_nodes, Point *points,
                     int _row,  int _column){
@@ -136,6 +208,20 @@ void validatePoint( int **map,  int _height,  int _width,
   }
 }
 
+/**
+ * gera as permutações do caminho e inidca a de melhor custo
+ * @param graph       hipergrafo
+ * @param best_cost   melhor custo ate ao momento
+ * @param num_points  numeor de pontos do caminho melhor
+ * @param size        numero de nós para os quais tem de se gerar
+ * permutacoes (num_tur_points-1(origem))
+ * @param answer       ordem do melhor caminho
+ * @param visited     vetor auxiliar que indica os nós visitados na análise
+ * em curso
+ * @param permutation vetor aux que guarda permutacao atual
+ * @param depth       numero de nós visitados na analise em curso
+ * @param cost_acum   custo da permutacao a ser analisada, no momento
+ */
 void checkPermutations(HyperNode *graph, int *best_cost, int *num_points, int size, int *answer, int *visited, int *permutation,
                        int depth, int cost_acum){
   int cur_edge_cost = 0;
@@ -166,6 +252,9 @@ void checkPermutations(HyperNode *graph, int *best_cost, int *num_points, int si
   }
 }
 
+/**
+ * calcula o custo do caminho de uma permutacao
+ */
 int pathCost(HyperNode *graph, int *permutation, int size){
   int previous_ix = 0;
   int cost = 0;

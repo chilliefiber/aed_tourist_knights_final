@@ -48,6 +48,9 @@ void freeTurPoints(int _num_tur_points, int ***tur_points){
   *tur_points = NULL;
 }
 
+/**
+ * liberta a mem allocada de um no do  hipergrafo
+ */
 void freeHyperNode(HyperNode n, int num_tur_points){
   for (int i = 0; i < num_tur_points; i++){
     if (n.edges[i] != NULL)
@@ -57,6 +60,9 @@ void freeHyperNode(HyperNode n, int num_tur_points){
   free(n.edges);
 }
 
+/**
+ * liberta memoria alocada para um caminho
+ */
 void freePath(Path *p){
   if (p == NULL)
     return;
@@ -65,6 +71,9 @@ void freePath(Path *p){
   freePath(next);
 }
 
+/**
+ * liberta a mem alocada para o hipergrafo
+ */
 void freeGraph(HyperNode *graph, int _num_tur_points){
   for (int i = 0; i < _num_tur_points; i = i + 1)
     freeHyperNode(graph[i], _num_tur_points);

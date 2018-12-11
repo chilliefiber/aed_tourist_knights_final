@@ -33,8 +33,7 @@ PQueue *createQueue( int _height,  int _width){
 }
 
 /**
- * AQUI
- * @param q [description]
+ * liberta a memoria da lista prioritaria
  */
 void freeQueue(PQueue *q){
   free(q->heap);
@@ -52,7 +51,7 @@ void freeQueue(PQueue *q){
  * @param  _origin_row    coordenada do ponto a que a recursao pretende chegar (origem)
  * @param  _origin_column coordenada do ponto a que a recursao pretende chegar (origem)
  * @param  num_points     numero de pontos do caminho
- * @return                ponteiro para lista que regista o caminho mais curto 
+ * @return                ponteiro para lista que regista o caminho mais curto
  */
 Path *createPath(Node *cur, Path *previous,  int _origin_row,  int _origin_column,  int *num_points){
   Path *p = initPath(cur->coords.row, cur->coords.column, previous);
@@ -179,25 +178,6 @@ char empty(PQueue *q){
 
  int newCost( int **map, Node *src, Point *dest){
   return src->cost + map[dest->row][dest->column];
-}
-
-/**
- * AQUI
- * @param whole_path [description]
- * @param path       [description]
- */
-void joinPaths(Path **whole_path, Path *path){
-  if(*whole_path==NULL){
-    *whole_path=path;
-    return;
-  }
-
-  Path *curr = *whole_path;
-
-  while(curr->next!=NULL)
-    curr=curr->next;
-
-  curr->next=path;
 }
 
 void initHyperNode(int ix, HyperNode *graph, int **map, int num_tur_points, int **tur_points){

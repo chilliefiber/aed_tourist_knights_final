@@ -81,7 +81,6 @@ Path *createPath(Node *cur, Path *previous,  int _origin_row,  int _origin_colum
 Path *reversePath(Path *previous_path, int **tur_points, int new_dest_ix, int new_src_ix);
 Path *initPath(int row, int column, Path *next);
 Path *traversePath(Path *previous, int **tur_points, int new_src_ix, Path *old);
-void joinPaths(Path **whole_path, Path *path);
 Edge *createEdge(Path *p, int cost, int num_points);
 void initHyperNode(int ix, HyperNode *graph, int **map, int num_tur_points, int **tur_points);
 #endif

@@ -17,7 +17,6 @@ int main(int argc, char **argv){
   FILE* output = fopen(output_name, "w");
   free(output_name);
   if (output == NULL){
-    //printf("Erro a criar ficheiro de output\n");
     fclose(input);
     exit (0);
   }
@@ -80,7 +79,7 @@ int main(int argc, char **argv){
           if (map[tur_points[0][0]][tur_points[0][1]] &&  !dest_eq_src)
             path = search(map, height, width, tur_points[0][0], tur_points[0][1],
                               tur_points[1][0], tur_points[1][1], &cost, &num_points, &aux);
-        }    
+        }
        if(!cost){
           cost=-1;
           num_points=0;
@@ -97,7 +96,6 @@ int main(int argc, char **argv){
         }
       }
       else if(objective == 'B'){
-        //Path *path;
         Path *whole_path = NULL;
         Path *tail = NULL;
         cost_acum=0;
@@ -120,9 +118,9 @@ int main(int argc, char **argv){
             }
             cost_acum+=cost;
           }
-        } 
+        }
         else
-          cost_acum=-1; 
+          cost_acum=-1;
         fprintf(output, "%d %d\n", cost_acum, num_points);
         Path *p_aux;
         while (whole_path != NULL){
@@ -141,7 +139,7 @@ int main(int argc, char **argv){
           possible = 0;
           // verificar se o caminho é possível
         if (possible){
-          graph = safeMalloc(sizeof(HyperNode) * num_tur_points); 
+          graph = safeMalloc(sizeof(HyperNode) * num_tur_points);
           fillNode(0, graph, map, height, width, tur_points, num_tur_points);
           for (int i = 1; i < num_tur_points;i = i + 1){
             if (graph[0].edges[i] == NULL){
@@ -163,9 +161,9 @@ int main(int argc, char **argv){
           int *best_order = safeMalloc(sizeof(int) * (num_tur_points - 1)); // guarda a melhor permutação
           int *visited = safeMalloc(sizeof(int) * (num_tur_points - 1));
           for (int i = 0; i < num_tur_points - 1; i = i + 1)
-            visited[i] = 0;     
+            visited[i] = 0;
           checkPermutations(graph, &cost, &num_points, num_tur_points - 1, best_order, visited, order,
-                       0, 0); 
+                       0, 0);
           fprintf(output, "%d %d\n", cost, num_points);
           cost = 0;
           // iterar pelos pontos turisticos todos menos o ultimo
@@ -175,7 +173,7 @@ int main(int argc, char **argv){
             // iterar pelos pontos da aresta
             p = graph[previous_ix].edges[best_order[i]]->path;
             while (p != NULL){
-              fprintf(output, "%d %d %d\n", p->coords.row, p->coords.column, map[p->coords.row][p->coords.column]);     
+              fprintf(output, "%d %d %d\n", p->coords.row, p->coords.column, map[p->coords.row][p->coords.column]);
               cost += map[p->coords.row][p->coords.column];
               p = p->next;
             }
